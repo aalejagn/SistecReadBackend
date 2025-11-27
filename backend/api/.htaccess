@@ -1,0 +1,53 @@
+# .htaccess para InfinityFree - Evitar bloqueos 403
+
+# Habilitar rewrite
+RewriteEngine On
+
+# ============== RESPUESTA RÁPIDA A OPTIONS ==============
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# ============== HEADERS CORS ==============
+<IfModule mod_headers.c>
+    # Permitir Vercel
+    Header always set Access-Control-Allow-Origin "https://empresa-sistec-t5fv.vercel.app"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, X-Requested-With"
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Max-Age "86400"
+    
+    # Evitar que InfinityFree bloquee peticiones
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# ============== PROTECCIÓN CONTRA BLOQUEOS ==============
+# InfinityFree puede bloquear si detecta demasiadas peticiones
+<IfModule mod_rewrite.c>
+    # No bloquear peticiones de Vercel
+    RewriteCond %{HTTP:Origin} ^https://empresa-sistec-t5fv\.vercel\.app$ [NC]
+    RewriteRule .* - [E=HTTP_ORIGIN:%{HTTP:Origin}]
+</IfModule>
+
+# ============== CONFIGURACIÓN PHP ==============
+<IfModule mod_php.c>
+    # Desactivar sesiones automáticas (InfinityFree las bloquea)
+    php_flag session.auto_start off
+    
+    # Aumentar límites
+    php_value max_execution_time 30
+    php_value memory_limit 64M
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+</IfModule>
+
+# ============== PROTEGER ARCHIVOS SENSIBLES ==============
+<FilesMatch "^(database\.php|config\.php|\.env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ============== ERRORES ==============
+# Mostrar errores solo en desarrollo (comentar en producción)
+# php_flag display_errors on
+# php_value error_reporting E_ALL
