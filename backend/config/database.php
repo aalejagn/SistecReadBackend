@@ -4,7 +4,7 @@ $host = "hopper.proxy.rlwy.net";
 $port = 43445;
 $dbname = "railway";
 $username = "root";
-$password = "TU_PASSWORD_REAL"; // la de Railway
+$password = "ZKIgUggnEPvJlodDsQjjLjUWZkvxdwBs"; // la de Railway
 
 try {
     $conn = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password);
