@@ -1,0 +1,14 @@
+:80
+
+# Tu index.php está en la raíz
+root * .
+
+php_fastcgi localhost:9000
+
+file_server
+
+# Manejo de rutas API
+handle_path /api/* {
+    rewrite * /api/{path}
+    php_fastcgi localhost:9000
+}
